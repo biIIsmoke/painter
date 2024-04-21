@@ -1,6 +1,7 @@
 using System;
 using PainterCanvas.Repository;
 using TMPro;
+using Tools.View;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -12,13 +13,16 @@ namespace PainterCanvas.View
         [SerializeField] private Camera _camera;
         [SerializeField] private Vector3 _mousePosition;
 
+        private IToolsView _toolsView;
         private IPainterCanvasRepository _painterCanvasRepository;
         
         public event Action OnImageLoad;
         
         [Inject]
-        public void Construct(IPainterCanvasRepository painterCanvasRepository)
+        public void Construct(IToolsView toolsView,
+            IPainterCanvasRepository painterCanvasRepository)
         {
+            _toolsView = toolsView;
             _painterCanvasRepository = painterCanvasRepository;
             _camera = Camera.main;
         }

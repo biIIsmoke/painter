@@ -7,6 +7,7 @@ namespace Tools.View
     public interface IToolsView
     {
         event Action<PaintTool> OnToolButtonClicked;
-        void OnToolButtonClick(int tool);
+        void OnToolButtonClick(int toolIndex);
+        void OnColorButtonClick(GameObject button);
     }
 }

@@ -5,7 +5,7 @@ namespace Tools.Repository
 {
     public class ToolsRepository : IToolsRepository
     {
-        public PaintTool Tool { get; set; }
+        public PaintTool SelectedTool { get; set; }
         public Color SelectedColor { get; set; }
 
         public ToolsRepository()
@@ -20,7 +20,12 @@ namespace Tools.Repository
 
         public void ChangeTool(PaintTool tool)
         {
-            Tool = tool;
+            SelectedTool = tool;
+        }
+
+        public void ChangeColor(Color color)
+        {
+            SelectedColor = color;
         }
     }
 
@@ -31,5 +36,12 @@ namespace Tools.Repository
         Stamp,
         Eraser,
         Splash
+    }
+
+    public enum PaintColors
+    {
+        Red,
+        Green,
+        Blue
     }
 }
