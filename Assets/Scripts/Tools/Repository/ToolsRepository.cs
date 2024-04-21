@@ -6,6 +6,7 @@ namespace Tools.Repository
     public class ToolsRepository : IToolsRepository
     {
         public PaintTool Tool { get; set; }
+        public Color SelectedColor { get; set; }
 
         public ToolsRepository()
         {
@@ -15,6 +16,11 @@ namespace Tools.Repository
         public void Reset()
         {
             
+        }
+
+        public void ChangeTool(PaintTool tool)
+        {
+            Tool = tool;
         }
     }
 

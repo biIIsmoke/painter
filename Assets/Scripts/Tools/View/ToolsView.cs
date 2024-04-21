@@ -38,7 +38,7 @@ namespace Tools.View
         
         public void OnToolButtonClick(int tool) //change tool
         {
-            _toolsRepository.Tool = (PaintTool)tool;
+            _toolsRepository.ChangeTool((PaintTool)tool);
             OnToolButtonClicked?.Invoke(_toolsRepository.Tool);
         }
     }
