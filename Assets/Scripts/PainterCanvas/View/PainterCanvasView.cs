@@ -62,13 +62,11 @@ namespace PainterCanvas.View
         
         public void CreateImage()
         {
-            _painterCanvasRepository.CanvasImage = new Texture2D(Screen.width, Screen.height);
-            GetComponent<SpriteRenderer>().sprite = Sprite.Create(_painterCanvasRepository.CanvasImage, new Rect(0,0,Screen.width,Screen.height), Vector2.one * 0.5f);
+            float screenAspect = (float)Screen.width / Screen.height;
+            float cameraHeight = _camera.orthographicSize * 2;
+            float screenWorldWidth = cameraHeight * screenAspect;
             
-            float screenHeight = _camera.orthographicSize * 2f;
-            float screenWidth = screenHeight * Screen.width / Screen.height;
-            
-            GetComponent<BoxCollider2D>().size = new Vector2(screenWidth, screenHeight);
+            transform.localScale = new Vector3(screenWorldWidth, cameraHeight, 1);
         }
     }
 }
