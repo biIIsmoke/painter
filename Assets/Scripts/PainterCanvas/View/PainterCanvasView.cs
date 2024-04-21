@@ -11,7 +11,7 @@ namespace PainterCanvas.View
     public class PainterCanvasView : MonoBehaviour, IPainterCanvasView
     {
         [SerializeField] private Camera _camera;
-        [SerializeField] private Vector3 _mousePosition;
+        [SerializeField] private Vector2 _mousePosition;
 
         private IToolsView _toolsView;
         private IPainterCanvasRepository _painterCanvasRepository;
@@ -55,9 +55,8 @@ namespace PainterCanvas.View
 
         private Vector3 GetMousePos()
         {
-            Vector3 cameraVector = _camera.ScreenToWorldPoint(Input.mousePosition);
-            Vector3 mousePos = new Vector3(cameraVector.x,.5f,cameraVector.z);
-            return mousePos;
+            Vector2 cameraVector = _camera.ScreenToWorldPoint(Input.mousePosition);
+            return cameraVector;
         }
         
         public void CreateImage()
@@ -65,6 +64,7 @@ namespace PainterCanvas.View
             float screenAspect = (float)Screen.width / Screen.height;
             float cameraHeight = _camera.orthographicSize * 2;
             float screenWorldWidth = cameraHeight * screenAspect;
+            Debug.Log($"my width is {screenWorldWidth} and height is {cameraHeight}");
             
             transform.localScale = new Vector3(screenWorldWidth, cameraHeight, 1);
         }
