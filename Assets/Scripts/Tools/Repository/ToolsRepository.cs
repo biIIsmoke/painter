@@ -7,18 +7,15 @@ namespace Tools.Repository
     {
         public PaintTool SelectedTool { get; set; }
         public Color SelectedColor { get; set; }
-        public bool CanDraw { get; set; }
 
         public ToolsRepository()
         {
             SelectedColor = Color.red;
-            CanDraw = true;
         }
 
         public void Reset()
         {
             SelectedColor = Color.red;
-            CanDraw = true;
         }
 
         public void ChangeTool(PaintTool tool)

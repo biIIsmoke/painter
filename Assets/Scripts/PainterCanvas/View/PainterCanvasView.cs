@@ -4,6 +4,7 @@ using TMPro;
 using Tools.Repository;
 using Tools.View;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
@@ -15,11 +16,12 @@ namespace PainterCanvas.View
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private Vector2 _mousePosition;
         [SerializeField] private Color _resetColor = new Color(0, 0, 0, 0);
+        
+        private bool _mouseDown = false;
 
         private Sprite _painterSprite;
         private Texture2D _painterTexture;
-        private Color32[] _currentColors;
-        
+        private Color[] _currentColors;
         private Color[] _cleanColors;
 
         private IToolsRepository _toolsRepository;
@@ -57,24 +59,55 @@ namespace PainterCanvas.View
 
         private void OnMouseDown()
         {
-            
+            _mouseDown = true;
         }
 
         private void OnMouseDrag()
         {
-            if (_toolsRepository.CanDraw)
+            if (!EventSystem.current.IsPointerOverGameObject())
             {
                 _mousePosition = GetMousePos();
                 Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _layerMask);
                 if (hit != null && hit.transform != null)
                 {
-                    PaintCanvas(_mousePosition);
+                    switch (_toolsRepository.SelectedTool)
+                    {
+                        case PaintTool.Pen:
+                            PaintCanvas(_mousePosition);
+                            break;
+                        case PaintTool.Bucket:
+                            if (_mouseDown)
+                            {
+                                FillCanvas();
+                                _mouseDown = false;
+                            }
+                            break;
+                        case PaintTool.Stamp:
+                            if (_mouseDown)
+                            {
+                                //use stamp
+                                _mouseDown = false;
+                            }
+                            break;
+                        case PaintTool.Eraser:
+                            
+                            break;
+                        case PaintTool.Splash:
+                            if (_mouseDown)
+                            {
+                                //use splash
+                                _mouseDown = false;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
         }
         private void OnMouseUp()
         {
-            
+            _mouseDown = false;
         }
 
         private Vector2 GetMousePos()
@@ -87,7 +120,7 @@ namespace PainterCanvas.View
         {
             Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
             
-            _currentColors = _painterTexture.GetPixels32();
+            _currentColors = _painterTexture.GetPixels();
             
             int pixelX = (int)pixelPosition.x;
             int pixelY = (int)pixelPosition.y;
@@ -105,7 +138,17 @@ namespace PainterCanvas.View
                 }
             }
             
-            _painterTexture.SetPixels32(_currentColors);
+            _painterTexture.SetPixels(_currentColors);
+            _painterTexture.Apply();
+        }
+
+        private void FillCanvas()
+        {
+            _currentColors = _painterTexture.GetPixels();
+            for (int x = 0; x < _currentColors.Length; x++)
+                _currentColors[x] = _toolsRepository.SelectedColor;
+            
+            _painterTexture.SetPixels(_currentColors);
             _painterTexture.Apply();
         }
         

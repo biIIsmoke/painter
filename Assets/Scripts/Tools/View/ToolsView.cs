@@ -53,15 +53,5 @@ namespace Tools.View
             _buttonImages[1].color = color;
             OnColorButtonClicked?.Invoke(_toolsRepository.SelectedColor);
         }
-
-        public void DisableDraw()
-        {
-            _toolsRepository.CanDraw = false;
-        }
-        public void EnableDraw()
-        {
-            _toolsRepository.CanDraw = true;
-        }
-        
     }
 }
