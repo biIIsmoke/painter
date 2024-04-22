@@ -16,7 +16,6 @@ namespace PainterCanvas.View
         [SerializeField] private Vector2 _mousePosition;
         [SerializeField] private Color _resetColor = new Color(0, 0, 0, 0);
 
-
         private Sprite _painterSprite;
         private Texture2D _painterTexture;
         private Color32[] _currentColors;
@@ -63,11 +62,14 @@ namespace PainterCanvas.View
 
         private void OnMouseDrag()
         {
-            _mousePosition = GetMousePos();
-            Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _layerMask);
-            if (hit != null && hit.transform != null)
+            if (_toolsRepository.CanDraw)
             {
-                PaintCanvas(_mousePosition);
+                _mousePosition = GetMousePos();
+                Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _layerMask);
+                if (hit != null && hit.transform != null)
+                {
+                    PaintCanvas(_mousePosition);
+                }
             }
         }
         private void OnMouseUp()

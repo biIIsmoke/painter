@@ -7,6 +7,7 @@ namespace Tools.Repository
     {
         PaintTool SelectedTool { get; set; }
         Color SelectedColor { get; set; }
+        bool CanDraw { get; set; }
         void Reset();
         void ChangeTool(PaintTool tool);
         void ChangeColor(Color color);
