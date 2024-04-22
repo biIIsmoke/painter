@@ -15,7 +15,7 @@ namespace PainterCanvas.View
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private Vector2 _mousePosition;
-        [SerializeField] private Color _resetColor = new Color(0, 0, 0, 0);
+        [SerializeField] private Color _resetColor = new Color(255,255,255,255);
         
         private bool _mouseDown = false;
 
@@ -73,7 +73,7 @@ namespace PainterCanvas.View
                     switch (_toolsRepository.SelectedTool)
                     {
                         case PaintTool.Pen:
-                            PaintCanvas(_mousePosition);
+                            PaintCanvas(_mousePosition, _toolsRepository.SelectedColor);
                             break;
                         case PaintTool.Bucket:
                             if (_mouseDown)
@@ -90,7 +90,7 @@ namespace PainterCanvas.View
                             }
                             break;
                         case PaintTool.Eraser:
-                            
+                            PaintCanvas(_mousePosition, _resetColor);
                             break;
                         case PaintTool.Splash:
                             if (_mouseDown)
@@ -116,7 +116,7 @@ namespace PainterCanvas.View
             return mouseWorldPosition;
         }
 
-        private void PaintCanvas(Vector2 mousePosition)
+        private void PaintCanvas(Vector2 mousePosition, Color color)
         {
             Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
             
@@ -134,7 +134,7 @@ namespace PainterCanvas.View
 
                 for (int y = pixelY - thickness; y <= pixelY + thickness; y++)
                 {
-                    MarkPixelToChange(x, y, _toolsRepository.SelectedColor);
+                    MarkPixelToChange(x, y, color);
                 }
             }
             
