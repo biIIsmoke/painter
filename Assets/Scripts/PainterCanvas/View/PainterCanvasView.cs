@@ -109,6 +109,7 @@ namespace PainterCanvas.View
         private void OnMouseUp()
         {
             _mouseDown = false;
+            SaveImage(_painterSprite.texture);
         }
 
         private Vector2 GetMousePos()
@@ -238,12 +239,6 @@ namespace PainterCanvas.View
         public Texture2D GetPainterTexture()
         {
             return _painterSprite.texture;
-        }
-
-        private void OnApplicationQuit()
-        {
-            SaveImage(_painterSprite.texture);
-            Debug.Log("image saved on application quit");
         }
     }
 }
