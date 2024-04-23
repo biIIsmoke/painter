@@ -1,3 +1,4 @@
+using System.IO;
 using PainterCanvas.Repository;
 using PainterCanvas.View;
 using UnityEngine;
@@ -24,7 +25,15 @@ namespace PainterCanvas.Controller
 
         private void OnImageLoaded()
         {
-            if(_painterCanvasView.GetPainterTexture().GetPixels(0,0,1,1)[0].a == 0) //if image is not initialized ie first pixel is not white, create new image
+            //if image in persistent path, else create one
+            string path = _painterCanvasRepository.dirPath + _painterCanvasRepository.textureFileName;
+            Debug.Log(path);
+            if(File.Exists(path))
+            {
+                //load image from path
+                _painterCanvasView.LoadImage();
+            }
+            else
             {
                 _painterCanvasView.CreateImage();
             }

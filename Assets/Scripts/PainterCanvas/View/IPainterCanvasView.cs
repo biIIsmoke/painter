@@ -8,6 +8,8 @@ namespace PainterCanvas.View
         event Action OnImageLoad;
 
         void CreateImage();
+        void SaveImage(Texture2D newTexture);
+        void LoadImage();
         Texture2D GetPainterTexture();
     }
 }

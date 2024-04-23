@@ -5,7 +5,8 @@ namespace PainterCanvas.Repository
 {
     public interface IPainterCanvasRepository
     {
-        Texture2D CanvasImage { get; set; }
+        string dirPath { get; set; }
+        string textureFileName { get; set; }
         
         void Reset();
     }

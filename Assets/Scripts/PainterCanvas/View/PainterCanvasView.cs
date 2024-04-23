@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using PainterCanvas.Repository;
 using TMPro;
 using Tools.Repository;
@@ -16,7 +17,6 @@ namespace PainterCanvas.View
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private Vector2 _mousePosition;
         [SerializeField] private Color _resetColor = new Color(255,255,255,255);
-        [SerializeField] private Texture2D _painterTexture;
         [SerializeField] private Texture2D _stampTexture;
         
         private bool _mouseDown = false;
@@ -54,7 +54,6 @@ namespace PainterCanvas.View
         {
             _camera = Camera.main;
             _painterSprite = this.GetComponent<SpriteRenderer>().sprite;
-            _painterTexture = _painterSprite.texture;
         }
 
         private void OnMouseDown()
@@ -122,7 +121,7 @@ namespace PainterCanvas.View
         {
             Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
             
-            _currentColors = _painterTexture.GetPixels();
+            _currentColors = _painterSprite.texture.GetPixels();
             
             int pixelX = (int)pixelPosition.x;
             int pixelY = (int)pixelPosition.y;
@@ -138,25 +137,25 @@ namespace PainterCanvas.View
                 }
             }
             
-            _painterTexture.SetPixels(_currentColors);
-            _painterTexture.Apply();
+            _painterSprite.texture.SetPixels(_currentColors);
+            _painterSprite.texture.Apply();
         }
 
         private void FillCanvas()
         {
-            _currentColors = _painterTexture.GetPixels();
+            _currentColors = _painterSprite.texture.GetPixels();
             for (int x = 0; x < _currentColors.Length; x++)
                 _currentColors[x] = _toolsRepository.SelectedColor;
             
-            _painterTexture.SetPixels(_currentColors);
-            _painterTexture.Apply();
+            _painterSprite.texture.SetPixels(_currentColors);
+            _painterSprite.texture.Apply();
         }
         
         private void StampTexture(Vector2 mousePosition)
         {
             Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
             
-            _currentColors = _painterTexture.GetPixels();
+            _currentColors = _painterSprite.texture.GetPixels();
             
             int pixelX = (int)pixelPosition.x;
             int pixelY = (int)pixelPosition.y;
@@ -168,14 +167,14 @@ namespace PainterCanvas.View
                     
                     Color paintColor = _stampTexture.GetPixel(x, y);
                     
-                    if (pixelX + x >= 0 && pixelY + y >= 0 && pixelX + x < _painterTexture.width && pixelY + y < _painterTexture.height)
+                    if (pixelX + x >= 0 && pixelY + y >= 0 && pixelX + x < _painterSprite.texture.width && pixelY + y < _painterSprite.texture.height)
                     {
                         MarkPixelToChange(pixelX + x, pixelY + y, paintColor);
                     }
                 }
             }
-            _painterTexture.SetPixels(_currentColors);
-            _painterTexture.Apply();
+            _painterSprite.texture.SetPixels(_currentColors);
+            _painterSprite.texture.Apply();
         }
         
         private Vector2 WorldToPixelCoordinates(Vector2 mousePosition)
@@ -206,17 +205,45 @@ namespace PainterCanvas.View
         
         public void CreateImage()
         {
-            _cleanColors = new Color[(int)_painterSprite.rect.width * (int)_painterSprite.rect.height];
+            Texture2D newTexture = new Texture2D(1000, 750, TextureFormat.RGBA32, false);
+            _cleanColors = new Color[newTexture.width * newTexture.height];
+            
             for (int x = 0; x < _cleanColors.Length; x++)
                 _cleanColors[x] = _resetColor;
             
-            _painterTexture.SetPixels(_cleanColors);
-            _painterTexture.Apply();
+            newTexture.SetPixels(_cleanColors);
+            newTexture.Apply();
+            Debug.Log("image created");
+            SaveImage(newTexture);
+            Destroy(newTexture);
+            LoadImage();
+        }
+
+        public void SaveImage(Texture2D newTexture)
+        {
+            byte[] bytes = newTexture.EncodeToPNG();
+            if(!Directory.Exists(_painterCanvasRepository.dirPath)) {
+                Directory.CreateDirectory(_painterCanvasRepository.dirPath);
+            }
+            File.WriteAllBytes(_painterCanvasRepository.dirPath + _painterCanvasRepository.textureFileName, bytes);
+            Debug.Log("image saved");
+        }
+        public void LoadImage()
+        {
+            byte[] bytes = File.ReadAllBytes(_painterCanvasRepository.dirPath + _painterCanvasRepository.textureFileName);
+            _painterSprite.texture.LoadImage(bytes);
+            Debug.Log("image loaded");
         }
 
         public Texture2D GetPainterTexture()
         {
-            return _painterTexture;
+            return _painterSprite.texture;
+        }
+
+        private void OnApplicationQuit()
+        {
+            SaveImage(_painterSprite.texture);
+            Debug.Log("image saved on application quit");
         }
     }
 }
