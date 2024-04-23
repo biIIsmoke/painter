@@ -25,12 +25,12 @@ namespace Tools.View
         {
             _toolsView = toolsView;
             _toolsRepository = toolsRepository;
-            //TODO: create tool buttons here under the tools panel
+            //TODO: we can create tool buttons here under the tools panel
         }
 
         private void OnEnable()
         {
-            //TODO: do onclick add listeners here for each button and change their text to match the order of the enum
+            //TODO: we can do onclick add listeners here for each button and change their text to match the order of the enum
             //_nextButton.onClick.AddListener(OnNextButtonClicked);
         }
 

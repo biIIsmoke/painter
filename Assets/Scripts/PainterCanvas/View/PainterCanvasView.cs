@@ -51,7 +51,6 @@ namespace PainterCanvas.View
 
         private void Awake()
         {
-            
             _camera = Camera.main;
             _painterSprite = this.GetComponent<SpriteRenderer>().sprite;
             _painterTexture = _painterSprite.texture;
@@ -85,7 +84,7 @@ namespace PainterCanvas.View
                         case PaintTool.Stamp:
                             if (_mouseDown)
                             {
-                                //use stamp
+                                //use stamp, add another for loop going through stamp pixel colors??
                                 _mouseDown = false;
                             }
                             break;
@@ -152,7 +151,7 @@ namespace PainterCanvas.View
             _painterTexture.Apply();
         }
         
-        public Vector2 WorldToPixelCoordinates(Vector2 mousePosition)
+        private Vector2 WorldToPixelCoordinates(Vector2 mousePosition)
         {
             Vector3 localPosition = transform.InverseTransformPoint(mousePosition);
             
@@ -168,7 +167,7 @@ namespace PainterCanvas.View
             return pixelPosition;
         }
         
-        public void MarkPixelToChange(int x, int y, Color color)
+        private void MarkPixelToChange(int x, int y, Color color)
         {
             int arrayPos = y * (int)_painterSprite.rect.width + x;
             
@@ -187,6 +186,11 @@ namespace PainterCanvas.View
             
             _painterTexture.SetPixels(_cleanColors);
             _painterTexture.Apply();
+        }
+
+        public Texture2D GetPainterTexture()
+        {
+            return _painterTexture;
         }
     }
 }

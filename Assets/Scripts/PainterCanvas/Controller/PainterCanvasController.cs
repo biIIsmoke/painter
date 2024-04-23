@@ -1,5 +1,6 @@
 using PainterCanvas.Repository;
 using PainterCanvas.View;
+using UnityEngine;
 
 namespace PainterCanvas.Controller
 {
@@ -23,12 +24,7 @@ namespace PainterCanvas.Controller
 
         private void OnImageLoaded()
         {
-            //TODO: check if there is image, if there is, display, else create one
-            if (false) //if there is an image saved, load it
-            {
-                
-            }
-            else //else create new image
+            if(_painterCanvasView.GetPainterTexture().GetPixels(0,0,1,1)[0].a == 0) //if image is not initialized ie first pixel is not white, create new image
             {
                 _painterCanvasView.CreateImage();
             }

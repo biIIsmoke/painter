@@ -10,12 +10,12 @@ namespace Tools.Repository
 
         public ToolsRepository()
         {
-            SelectedColor = Color.red;
+            SelectedColor = Color.white;
         }
 
         public void Reset()
         {
-            SelectedColor = Color.red;
+            SelectedColor = Color.white;
         }
 
         public void ChangeTool(PaintTool tool)
@@ -36,12 +36,5 @@ namespace Tools.Repository
         Stamp,
         Eraser,
         Splash
-    }
-
-    public enum PaintColors
-    {
-        Red,
-        Green,
-        Blue
     }
 }
