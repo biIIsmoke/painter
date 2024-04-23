@@ -3849,7 +3849,7 @@ Transform:
   m_GameObject: {fileID: 2094537042419098144}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: -5}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3871,7 +3871,9 @@ MonoBehaviour:
   _layerMask:
     serializedVersion: 2
     m_Bits: 64
-  _mousePosition: {x: 0, y: 0}
+  _thickness: 2
+  _mouseWorldPosition: {x: 0, y: 0}
+  _firstMouseWorldPosition: {x: 0, y: 0}
   _resetColor: {r: 255, g: 255, b: 255, a: 255}
   _stampTexture: {fileID: 2800000, guid: aeec0cdde2d5e8249bfca7ba6921eadf, type: 3}
 --- !u!61 &4213266764086335889

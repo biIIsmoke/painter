@@ -15,15 +15,16 @@ namespace PainterCanvas.View
     {
         [SerializeField] private Camera _camera;
         [SerializeField] private LayerMask _layerMask;
-        [SerializeField] private Vector2 _mousePosition;
+        [SerializeField] private int _thickness = 2;
+        [SerializeField] private Vector2 _mouseWorldPosition;
+        [SerializeField] private Vector2 _lastMouseWorldPosition = Vector2.zero;
         [SerializeField] private Color _resetColor = new Color(255,255,255,255);
         [SerializeField] private Texture2D _stampTexture;
-        
-        private bool _mouseDown = false;
 
         private Sprite _painterSprite;
         private Color[] _currentColors;
         private Color[] _cleanColors;
+        private bool _mouseDown;
 
         private IToolsRepository _toolsRepository;
         private IPainterCanvasRepository _painterCanvasRepository;
@@ -53,9 +54,9 @@ namespace PainterCanvas.View
         private void Awake()
         {
             _camera = Camera.main;
+            _mouseDown = false;
             _painterSprite = this.GetComponent<SpriteRenderer>().sprite;
         }
-
         private void OnMouseDown()
         {
             _mouseDown = true;
@@ -65,14 +66,21 @@ namespace PainterCanvas.View
         {
             if (!EventSystem.current.IsPointerOverGameObject())
             {
-                _mousePosition = GetMousePos();
-                Collider2D hit = Physics2D.OverlapPoint(_mousePosition, _layerMask);
+                _mouseWorldPosition = GetMouseWorldPosition();
+                Collider2D hit = Physics2D.OverlapPoint(_mouseWorldPosition, _layerMask);
                 if (hit != null && hit.transform != null)
                 {
                     switch (_toolsRepository.SelectedTool)
                     {
                         case PaintTool.Pen:
-                            PaintCanvas(_mousePosition, _toolsRepository.SelectedColor,2);
+                            if (_lastMouseWorldPosition == Vector2.zero)
+                            {
+                                PaintCanvas(_mouseWorldPosition, _toolsRepository.SelectedColor,_thickness);
+                            }
+                            else
+                            {
+                                DrawLine(_lastMouseWorldPosition, _mouseWorldPosition, _toolsRepository.SelectedColor,_thickness);
+                            }
                             break;
                         case PaintTool.Bucket:
                             if (_mouseDown)
@@ -84,14 +92,19 @@ namespace PainterCanvas.View
                         case PaintTool.Stamp:
                             if (_mouseDown)
                             {
-                                //use stamp, add another for loop going through stamp pixel colors??
-                                Debug.Log("call stamp");
-                                StampTexture(_mousePosition);
+                                StampTexture(_mouseWorldPosition);
                                 _mouseDown = false;
                             }
                             break;
                         case PaintTool.Eraser:
-                            PaintCanvas(_mousePosition, _resetColor,2);
+                            if (_lastMouseWorldPosition == Vector2.zero)
+                            {
+                                PaintCanvas(_mouseWorldPosition, _resetColor,_thickness);
+                            }
+                            else
+                            {
+                                DrawLine(_lastMouseWorldPosition, _mouseWorldPosition, _resetColor,_thickness);
+                            }
                             break;
                         case PaintTool.Splash:
                             if (_mouseDown)
@@ -103,16 +116,19 @@ namespace PainterCanvas.View
                         default:
                             break;
                     }
+                    //save last position
+                    _lastMouseWorldPosition = _mouseWorldPosition;
                 }
             }
         }
         private void OnMouseUp()
         {
             _mouseDown = false;
+            _lastMouseWorldPosition = Vector2.zero;
             SaveImage(_painterSprite.texture);
         }
 
-        private Vector2 GetMousePos()
+        private Vector2 GetMouseWorldPosition()
         {
             Vector2 mouseWorldPosition = _camera.ScreenToWorldPoint(Input.mousePosition);
             return mouseWorldPosition;
@@ -140,6 +156,18 @@ namespace PainterCanvas.View
             
             _painterSprite.texture.SetPixels(_currentColors);
             _painterSprite.texture.Apply();
+        }
+
+        private void DrawLine(Vector2 firstMouseWorldPosition, Vector2 mouseWorldPosition, Color color, int thickness)
+        {
+            float distance = Vector2.Distance(firstMouseWorldPosition, mouseWorldPosition);
+            Vector2 currentPosition;
+            float stepDistance = 1 / distance;
+            for (float i = 0.0f; i <= 1.0f; i += stepDistance)
+            {
+                currentPosition = Vector2.Lerp(firstMouseWorldPosition, mouseWorldPosition, i);
+                PaintCanvas(currentPosition,color,thickness);
+            }
         }
 
         private void FillCanvas()
@@ -214,7 +242,6 @@ namespace PainterCanvas.View
             
             newTexture.SetPixels(_cleanColors);
             newTexture.Apply();
-            Debug.Log("image created");
             SaveImage(newTexture);
             Destroy(newTexture);
             LoadImage();
@@ -227,13 +254,11 @@ namespace PainterCanvas.View
                 Directory.CreateDirectory(_painterCanvasRepository.dirPath);
             }
             File.WriteAllBytes(_painterCanvasRepository.dirPath + _painterCanvasRepository.textureFileName, bytes);
-            Debug.Log("image saved");
         }
         public void LoadImage()
         {
             byte[] bytes = File.ReadAllBytes(_painterCanvasRepository.dirPath + _painterCanvasRepository.textureFileName);
             _painterSprite.texture.LoadImage(bytes);
-            Debug.Log("image loaded");
         }
 
         public Texture2D GetPainterTexture()
