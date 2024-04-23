@@ -11,7 +11,7 @@ namespace Tools.View
 {
     public class ToolsView : MonoBehaviour, IToolsView
     {
-        [SerializeField] private List<Image> _buttonImages;
+        [SerializeField] private List<Button> _buttons;
         
         private IToolsView _toolsView;
         private IToolsRepository _toolsRepository;
@@ -41,16 +41,18 @@ namespace Tools.View
         
         public void OnToolButtonClick(int toolIndex) //change tool
         {
+            _buttons[(int)_toolsRepository.SelectedTool + 2].image.color = Color.white;
             _toolsRepository.ChangeTool((PaintTool)toolIndex);
             OnToolButtonClicked?.Invoke(_toolsRepository.SelectedTool);
+            _buttons[toolIndex + 2].image.color = Color.yellow;
         }
 
         public void OnColorButtonClick(GameObject button) 
         {    //for only three colors, no need to make it complicated by index etc. if there is more, we can use event triggers or create an rgb color selector
             Color color = button.GetComponent<Image>().color;
             _toolsRepository.ChangeColor(color);
-            _buttonImages[0].color = color;
-            _buttonImages[1].color = color;
+            _buttons[0].image.color = color;
+            _buttons[1].image.color = color;
             OnColorButtonClicked?.Invoke(_toolsRepository.SelectedColor);
         }
     }
