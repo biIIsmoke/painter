@@ -16,11 +16,12 @@ namespace PainterCanvas.View
         [SerializeField] private LayerMask _layerMask;
         [SerializeField] private Vector2 _mousePosition;
         [SerializeField] private Color _resetColor = new Color(255,255,255,255);
+        [SerializeField] private Texture2D _painterTexture;
+        [SerializeField] private Texture2D _stampTexture;
         
         private bool _mouseDown = false;
 
         private Sprite _painterSprite;
-        private Texture2D _painterTexture;
         private Color[] _currentColors;
         private Color[] _cleanColors;
 
@@ -41,12 +42,12 @@ namespace PainterCanvas.View
         {
             OnImageLoad?.Invoke();
             //TODO: do onclick add listeners here for each button and change their text to match the order of the enum
-            //_nextButton.onClick.AddListener(OnNextButtonClicked);
+            //button.onClick.AddListener(OnNextButtonClicked);
         }
 
         private void OnDisable()
         {
-            //_nextButton.onClick.RemoveListener(OnNextButtonClicked);
+            //button.onClick.RemoveListener(OnNextButtonClicked);
         }
 
         private void Awake()
@@ -72,7 +73,7 @@ namespace PainterCanvas.View
                     switch (_toolsRepository.SelectedTool)
                     {
                         case PaintTool.Pen:
-                            PaintCanvas(_mousePosition, _toolsRepository.SelectedColor);
+                            PaintCanvas(_mousePosition, _toolsRepository.SelectedColor,2);
                             break;
                         case PaintTool.Bucket:
                             if (_mouseDown)
@@ -85,11 +86,13 @@ namespace PainterCanvas.View
                             if (_mouseDown)
                             {
                                 //use stamp, add another for loop going through stamp pixel colors??
+                                Debug.Log("call stamp");
+                                StampTexture(_mousePosition);
                                 _mouseDown = false;
                             }
                             break;
                         case PaintTool.Eraser:
-                            PaintCanvas(_mousePosition, _resetColor);
+                            PaintCanvas(_mousePosition, _resetColor,2);
                             break;
                         case PaintTool.Splash:
                             if (_mouseDown)
@@ -115,7 +118,7 @@ namespace PainterCanvas.View
             return mouseWorldPosition;
         }
 
-        private void PaintCanvas(Vector2 mousePosition, Color color)
+        private void PaintCanvas(Vector2 mousePosition, Color color, int thickness)
         {
             Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
             
@@ -123,8 +126,6 @@ namespace PainterCanvas.View
             
             int pixelX = (int)pixelPosition.x;
             int pixelY = (int)pixelPosition.y;
-
-            int thickness = 2;
             
             for (int x = pixelX - thickness; x <= pixelX + thickness; x++)
             {
@@ -147,6 +148,32 @@ namespace PainterCanvas.View
             for (int x = 0; x < _currentColors.Length; x++)
                 _currentColors[x] = _toolsRepository.SelectedColor;
             
+            _painterTexture.SetPixels(_currentColors);
+            _painterTexture.Apply();
+        }
+        
+        private void StampTexture(Vector2 mousePosition)
+        {
+            Vector2 pixelPosition = WorldToPixelCoordinates(mousePosition);
+            
+            _currentColors = _painterTexture.GetPixels();
+            
+            int pixelX = (int)pixelPosition.x;
+            int pixelY = (int)pixelPosition.y;
+            
+            for (int x = 0; x < _stampTexture.width; x++)
+            {
+                for (int y = 0; y < _stampTexture.height; y++)
+                {
+                    
+                    Color paintColor = _stampTexture.GetPixel(x, y);
+                    
+                    if (pixelX + x >= 0 && pixelY + y >= 0 && pixelX + x < _painterTexture.width && pixelY + y < _painterTexture.height)
+                    {
+                        MarkPixelToChange(pixelX + x, pixelY + y, paintColor);
+                    }
+                }
+            }
             _painterTexture.SetPixels(_currentColors);
             _painterTexture.Apply();
         }
@@ -179,7 +206,6 @@ namespace PainterCanvas.View
         
         public void CreateImage()
         {
-            // Initialize clean pixels to use
             _cleanColors = new Color[(int)_painterSprite.rect.width * (int)_painterSprite.rect.height];
             for (int x = 0; x < _cleanColors.Length; x++)
                 _cleanColors[x] = _resetColor;
